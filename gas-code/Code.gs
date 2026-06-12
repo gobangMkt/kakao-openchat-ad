@@ -1,9 +1,11 @@
 var SPREADSHEET_ID = '18_OqLH7IuTznPL7gmhC-bfFeS9n28hIL6-fQy089Qxc';
 var DRIVE_FOLDER_NAME = '고방광고_신청이미지';
 
-// SOLAPI 알림톡 템플릿 ID는 Script Property에 저장 (SOLAPI_TPL_BASIC / SOLAPI_TPL_PIN)
-// API 키도 Script Property (SOLAPI_API_KEY / SOLAPI_API_SECRET / SOLAPI_PF_ID)
-// 토스 결제링크는 알림톡 템플릿 '버튼(웹링크)'에 직접 박음 (빌리투어 방식)
+// SOLAPI 알림톡 템플릿 ID (빌리투어 방식 — 코드 상수). 토스링크는 템플릿 버튼에 박힘.
+var TEMPLATE_PAYMENT_BASIC = 'KA01TP260612084241625s0nivDDF0Wo';  // 게시1회 결제요청
+var TEMPLATE_PAYMENT_PIN   = 'KA01TP260612084525261p24CkUTaC4d';  // 게시+공지고정 결제요청
+
+// API 키만 Script Property (SOLAPI_API_KEY / SOLAPI_API_SECRET / SOLAPI_PF_ID)
 
 // 토스 결제링크 (참고용 — 템플릿 버튼에 사용)
 var PAY_LINK_BASIC = 'https://s.tosspayments.com/BnrvwJX8Jsg';  // 게시1회 (50,000 + VAT)
@@ -152,18 +154,17 @@ function sendAlimtalk(to, templateId, variables) {
 /* SOLAPI 설정 점검 — 속성 SET/MISSING 로그 (값 미노출) */
 function checkSolapiConfig() {
   var p = PropertiesService.getScriptProperties();
-  ['SOLAPI_API_KEY', 'SOLAPI_API_SECRET', 'SOLAPI_PF_ID', 'SOLAPI_TPL_BASIC', 'SOLAPI_TPL_PIN'].forEach(function(k) {
+  ['SOLAPI_API_KEY', 'SOLAPI_API_SECRET', 'SOLAPI_PF_ID'].forEach(function(k) {
     Logger.log(k + ': ' + (p.getProperty(k) ? 'SET' : 'MISSING'));
   });
+  Logger.log('TEMPLATE_BASIC: ' + TEMPLATE_PAYMENT_BASIC + ' / TEMPLATE_PIN: ' + TEMPLATE_PAYMENT_PIN);
 }
 
 /* 알림톡 테스트 발송 — Script Property SOLAPI_TEST_PHONE 번호로 게시1회 템플릿 발송 */
 function testAlimtalk() {
-  var p = PropertiesService.getScriptProperties();
-  var to = p.getProperty('SOLAPI_TEST_PHONE');
-  var tpl = p.getProperty('SOLAPI_TPL_BASIC');
-  if (!to || !tpl) { Logger.log('SOLAPI_TEST_PHONE / SOLAPI_TPL_BASIC 설정 필요'); return; }
-  var res = sendAlimtalk(to, tpl, { '#{신청자}': '테스트' });
+  var to = PropertiesService.getScriptProperties().getProperty('SOLAPI_TEST_PHONE');
+  if (!to) { Logger.log('SOLAPI_TEST_PHONE 설정 필요'); return; }
+  var res = sendAlimtalk(to, TEMPLATE_PAYMENT_BASIC, { '#{신청자}': '테스트' });
   Logger.log('테스트 발송 응답: ' + res.getContentText());
 }
 
@@ -210,15 +211,7 @@ function handlePaymentSend(e, sheet, row) {
   var company = String(rowData[2] || '').trim();          // C 상호
   var phone   = String(rowData[3]).replace(/[^0-9]/g, ''); // D 연락처
   var label   = String(rowData[4] || '').trim();           // E 상품선택
-  var props = PropertiesService.getScriptProperties();
-  var templateId = (label === '게시+공지고정')
-    ? props.getProperty('SOLAPI_TPL_PIN')
-    : props.getProperty('SOLAPI_TPL_BASIC');
-  if (!templateId) {
-    Logger.log('알림톡 템플릿 미설정 (SOLAPI_TPL_BASIC/PIN) — 발송 보류');
-    e.range.setValue('발송대기');
-    return;
-  }
+  var templateId = (label === '게시+공지고정') ? TEMPLATE_PAYMENT_PIN : TEMPLATE_PAYMENT_BASIC;
   try {
     sendAlimtalk(phone, templateId, { '#{신청자}': company });
     sheet.getRange(row, 11).setValue(Utilities.formatDate(new Date(), 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss'));
@@ -324,6 +317,114 @@ function resetDataSheets() {
   Logger.log('신청 내역 초기화 + 재생성 완료(12열)');
 }
 
+/* ═══════════════════════════════════════════════════════════
+   CS 도움앱 — 단건상품요청 인박스 중계 (listRequests / sendPaymentLink / setPaymentDate)
+   신청 내역(12열): A신청일시 B결제완료일 C상호 D연락처 E상품선택 F광고문구
+                    G이미지URL H게시희망일 I검수메모 J결제링크발송 K발송시간 L게시완료
+   공유 토큰(Script Property INBOX_TOKEN) 검증. 연락처(D)는 응답에서 제외.
+═══════════════════════════════════════════════════════════ */
+function checkInboxToken_(token) {
+  var t = PropertiesService.getScriptProperties().getProperty('INBOX_TOKEN');
+  return !!t && token === t;
+}
+function fmtDateTime_(v) {
+  if (!v) return '';
+  if (v instanceof Date) return Utilities.formatDate(v, 'Asia/Seoul', 'yyyy-MM-dd HH:mm');
+  return String(v);
+}
+function fmtDate_(v) {
+  if (!v) return '';
+  if (v instanceof Date) return Utilities.formatDate(v, 'Asia/Seoul', 'yyyy-MM-dd');
+  return String(v);
+}
+
+// 신청 내역(12열) → 연락처(D) 제외 목록. 결제완료일(B)로 paid 판정.
+function listRequests(token) {
+  if (!checkInboxToken_(token)) return { error: 'unauthorized' };
+  var sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('신청 내역');
+  var lastRow = sheet.getLastRow();
+  var items = [];
+  if (lastRow >= 2) {
+    var data = sheet.getRange(2, 1, lastRow - 1, 12).getValues();
+    for (var i = 0; i < data.length; i++) {
+      var r = data[i];
+      if (!String(r[3] || '').trim()) continue; // 연락처(D) 빈 행=공지 등 → 제외
+      var paidVal = r[1]; // B 결제완료일
+      items.push({
+        row: i + 2,
+        신청일시: fmtDateTime_(r[0]),
+        paid: !!paidVal,
+        paidDate: fmtDate_(paidVal),
+        paidDateISO: fmtDate_(paidVal),
+        신청자: String(r[2] || ''),    // C 상호
+        // 연락처 r[3] 제외(PII)
+        상품선택: String(r[4] || ''),    // E
+        광고문구: String(r[5] || ''),    // F
+        이미지URL: String(r[6] || ''),   // G
+        게시희망일: fmtDate_(r[7]),       // H
+        검수메모: String(r[8] || ''),     // I
+        발송상태: String(r[9] || ''),     // J 결제링크 발송
+        게시완료: String(r[11] || '')     // L
+      });
+    }
+  }
+  return { sheetUrl: 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID, items: items };
+}
+
+// 결제요청 알림톡 발송 + J='발송완료'·K=발송시간. SOLAPI 템플릿 미설정 시 안내(수동 발송).
+function sendPaymentLink(token, row) {
+  if (!checkInboxToken_(token)) return { error: 'unauthorized' };
+  var sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('신청 내역');
+  if (row < 2 || row > sheet.getLastRow()) return { error: 'invalid_row' };
+  if (sheet.getRange(row, 11).getValue()) return { ok: true, already: true }; // K 발송시간 가드
+
+  var rowData = sheet.getRange(row, 1, 1, 12).getValues()[0];
+  var company = String(rowData[2] || '').trim();  // C 상호
+  var phone   = String(rowData[3] || '');         // D 연락처
+  var label   = String(rowData[4] || '').trim();  // E 상품선택
+  if (!phone) return { error: 'no_phone' };
+
+  var props = PropertiesService.getScriptProperties();
+  var templateId = (label === '게시+공지고정')
+    ? props.getProperty('SOLAPI_TPL_PIN')
+    : props.getProperty('SOLAPI_TPL_BASIC');
+  if (!templateId) return { error: 'SOLAPI 템플릿 미설정 — 결제링크는 수동 발송하세요.' };
+
+  try {
+    var res = sendAlimtalk(phone, templateId, { '#{신청자}': company });
+    var code = res.getResponseCode();
+    var body = JSON.parse(res.getContentText() || '{}');
+    if (code !== 200 || (body.statusCode && body.statusCode !== '2000')) {
+      throw new Error('HTTP ' + code + ' / ' + (body.statusMessage || res.getContentText()));
+    }
+    sheet.getRange(row, 11).setValue(Utilities.formatDate(new Date(), 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss'));
+    sheet.getRange(row, 10).setValue('발송완료');
+    return { ok: true };
+  } catch (e) {
+    return { error: String(e) };
+  }
+}
+
+// 결제완료일(B) 기입/취소. 프로그래밍 setValue는 onEdit 미발동 → 결제완료 메일 직접 발송.
+function setPaymentDate(token, row, date) {
+  if (!checkInboxToken_(token)) return { error: 'unauthorized' };
+  var sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('신청 내역');
+  if (row < 2 || row > sheet.getLastRow()) return { error: 'invalid_row' };
+
+  if (!date) {
+    sheet.getRange(row, 2).clearContent(); // B열 취소
+    return { ok: true };
+  }
+  var d = new Date(date); // 'yyyy-MM-dd'
+  sheet.getRange(row, 2).setValue(d);
+  try {
+    notifyGobangPaymentComplete_(sheet, row, Utilities.formatDate(d, 'Asia/Seoul', 'yyyy-MM-dd'));
+  } catch (e) {
+    Logger.log('결제완료 후속작업 실패: ' + e);
+  }
+  return { ok: true };
+}
+
 function doGet(e) {
   return ContentService.createTextOutput(JSON.stringify({ status: 'ok' }))
     .setMimeType(ContentService.MimeType.JSON);
@@ -338,6 +439,12 @@ function doPost(e) {
       result = { ok: a.ok, reason: a.reason || '' };
     } else if (payload.action === 'submitForm') {
       result = submitForm(payload);
+    } else if (payload.action === 'listRequests') {
+      result = listRequests(payload.token);
+    } else if (payload.action === 'sendPaymentLink') {
+      result = sendPaymentLink(payload.token, payload.row);
+    } else if (payload.action === 'setPaymentDate') {
+      result = setPaymentDate(payload.token, payload.row, payload.date);
     } else {
       result = { error: 'Unknown action: ' + payload.action };
     }
