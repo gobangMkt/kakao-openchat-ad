@@ -1,0 +1,4 @@
+gas-code/.clasp.json
+node_modules/
+.DS_Store
+.playwright-mcp/

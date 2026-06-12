@@ -1,0 +1,106 @@
+<!doctype html><html lang="ko"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>고방 오픈카톡방 광고 신청</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+<link rel="stylesheet" href="colors_and_type.css">
+<style>
+  .wrap{max-width:640px;margin:0 auto;padding:24px 18px 80px}
+  .hero{background:var(--gobang-dark);color:#fff;border-radius:var(--radius);padding:28px 24px;margin-bottom:20px}
+  .hero h1{margin:0 0 6px;font-size:22px} .hero p{margin:0;color:#C7D4EC;font-size:14px}
+  .plans{display:grid;gap:12px;margin:18px 0}
+  .plan{border:2px solid var(--border);border-radius:var(--radius);padding:16px;background:var(--surface);cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+  .plan.sel{border-color:var(--gobang-primary);box-shadow:0 0 0 3px rgba(27,100,218,.12)}
+  .plan .price{font-weight:700;color:var(--gobang-primary);white-space:nowrap;margin-left:12px}
+  label{display:block;font-size:13px;font-weight:600;margin:14px 0 6px}
+  input,textarea{width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;font-family:inherit;font-size:15px}
+  textarea{min-height:120px;resize:vertical}
+  .req::after{content:' *';color:#E53935}
+  .btn{width:100%;padding:15px;border:0;border-radius:12px;background:var(--gobang-primary);color:#fff;font-size:16px;font-weight:700;margin-top:22px;cursor:pointer}
+  .btn:disabled{opacity:.5}
+  .note{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.6}
+  .done{text-align:center;padding:60px 20px;display:none}
+  .done.show{display:block} .form.hide{display:none}
+  .rules{background:#FFF6E5;border-radius:10px;padding:12px;font-size:12px;color:#8a6d3b;margin-top:8px;line-height:1.6}
+</style></head><body>
+<div class="wrap">
+  <div class="hero">
+    <h1>고방 오픈카톡방 광고 신청</h1>
+    <p>청년 주거·주택·자금 지원 정보공유 (1,178명) · 스폰서 게시</p>
+  </div>
+
+  <form id="form" class="form">
+    <div class="plans">
+      <div class="plan sel" data-code="A">
+        <div><strong>게시 1회</strong><div class="note">[광고] 표기 업로드 · 다음날 자정까지 유지</div></div>
+        <div class="price">55,000원</div>
+      </div>
+      <div class="plan" data-code="B">
+        <div><strong>게시 1회 + 공지 고정 24h</strong><div class="note">공지 상단 고정 24시간</div></div>
+        <div class="price">110,000원</div>
+      </div>
+    </div>
+
+    <label class="req">상호 / 광고주명</label>
+    <input id="company" required>
+    <label class="req">연락처 (휴대폰)</label>
+    <input id="phone" type="tel" placeholder="010-0000-0000" required>
+    <label class="req">광고 문구</label>
+    <textarea id="adText" required placeholder="게시할 광고 문구를 입력해주세요. ([광고] 표기로 업로드됩니다)"></textarea>
+    <label class="req">광고 이미지 (1장)</label>
+    <input id="image" type="file" accept="image/png,image/jpeg" required>
+    <div class="note">jpg/png, 5MB 이하 1장</div>
+    <label class="req">게시 희망일</label>
+    <input id="publishDate" type="date" required>
+    <label>사업자 정보 (세금계산서용 · 선택)</label>
+    <input id="bizInfo" placeholder="상호 / 사업자번호 / 이메일">
+    <div class="rules">
+      ⚠️ 방 규칙: 집광고·어플·유튜브·블로그·카페 등 외부 링크 언급 게시물은 게시 불가합니다. 문구·이미지는 사전 검수 후 [광고] 표기로 업로드됩니다.
+    </div>
+    <label style="display:flex;gap:8px;align-items:center;font-weight:400;margin-top:12px">
+      <input type="checkbox" id="agree" style="width:auto" required> 위 방 규칙에 동의합니다.
+    </label>
+    <button class="btn" id="submit" type="submit">검수 신청하기</button>
+    <div class="note">신청 후 검수(보통 1영업일) → 통과 시 카카오 알림톡으로 결제링크를 보내드립니다. (VAT 포함 금액)</div>
+  </form>
+
+  <div class="done" id="done">
+    <h2>✅ 신청이 접수됐어요</h2>
+    <p class="note">검수 후 통과되면 입력하신 연락처로 결제링크를 보내드립니다.</p>
+  </div>
+</div>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbx4XYws7n2YJUsib-6kRzOCdivAL9moaNXMjGKPIIAFhRYKmkDzkgopyRuhlJpgg30E/exec';
+let product = 'A';
+document.querySelectorAll('.plan').forEach(p => p.addEventListener('click', () => {
+  document.querySelectorAll('.plan').forEach(x => x.classList.remove('sel'));
+  p.classList.add('sel'); product = p.dataset.code;
+}));
+
+function fileToDataURL(file){ return new Promise((res,rej)=>{
+  const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); }); }
+
+document.getElementById('form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('submit');
+  const file = document.getElementById('image').files[0];
+  if (file && file.size > 5*1024*1024) { alert('이미지는 5MB 이하 1장만 가능합니다.'); return; }
+  btn.disabled = true; btn.textContent = '제출 중...';
+  try {
+    const imageData = file ? await fileToDataURL(file) : '';
+    const body = {
+      action:'submitForm', product,
+      company: company.value.trim(), phone: phone.value.trim(),
+      adText: adText.value.trim(), publishDate: publishDate.value,
+      bizInfo: bizInfo.value.trim(), imageData, imageName: file ? file.name : ''
+    };
+    const r = await fetch(GAS_URL, { method:'POST', body: JSON.stringify(body) });
+    const j = await r.json();
+    if (j.success) {
+      document.getElementById('form').classList.add('hide');
+      document.getElementById('done').classList.add('show');
+    } else { alert('제출 실패: ' + (j.error || j.reason || '다시 시도해주세요')); btn.disabled=false; btn.textContent='검수 신청하기'; }
+  } catch (err) { alert('네트워크 오류. 다시 시도해주세요.'); btn.disabled=false; btn.textContent='검수 신청하기'; }
+});
+</script></body></html>

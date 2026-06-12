@@ -1,0 +1,9 @@
+:root{
+  --gobang-primary:#1B64DA;   /* 고방 블루 */
+  --gobang-dark:#0F2E66;
+  --gobang-accent:#FFB020;
+  --bg:#F7F9FC; --surface:#FFFFFF; --text:#1A2233; --muted:#6B7588;
+  --border:#E3E8F0; --radius:14px;
+  --font:'Pretendard',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font)}
