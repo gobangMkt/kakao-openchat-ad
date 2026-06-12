@@ -61,6 +61,7 @@
   .f:last-child{margin-bottom:0}
   .lab{display:block;font-size:13.5px;font-weight:700;color:var(--ink-2);margin-bottom:8px}
   .lab .req{color:var(--blue);margin-left:2px}
+  .lab .opt{color:var(--muted);font-weight:600;font-size:12px;margin-left:4px}
   .inp,.ta{width:100%;border:1.5px solid var(--border-strong);background:#fff;border-radius:var(--r-sm);
     padding:14px 15px;font-size:15.5px;font-family:inherit;color:var(--ink);transition:.15s;-webkit-appearance:none}
   .inp::placeholder,.ta::placeholder{color:#A9B3C9}
@@ -158,12 +159,12 @@
     <!-- 1. 상품 -->
     <section class="sec reveal" style="animation-delay:.08s">
       <div class="sec-h"><span class="sec-n">1</span><span class="sec-t">상품 선택</span></div>
-      <button type="button" class="plan sel" data-code="A" data-price="55,000">
+      <button type="button" class="plan" data-code="A" data-price="55,000">
         <span class="radio"></span>
         <span class="info"><span class="nm">게시 1회</span><span class="desc">[광고] 표기 업로드 · 다음날 자정까지 노출 유지</span></span>
         <span class="price">55,000원</span>
       </button>
-      <button type="button" class="plan" data-code="B" data-price="110,000">
+      <button type="button" class="plan sel" data-code="B" data-price="110,000">
         <span class="radio"></span>
         <span class="info"><span class="nm">게시 1회 + 공지 고정 24h <span class="badge-best">BEST</span></span><span class="desc">게시 + 채팅방 공지 상단 24시간 고정</span></span>
         <span class="price">110,000원</span>
@@ -192,20 +193,20 @@
         <textarea class="ta" id="adText" maxlength="1000" placeholder="게시할 광고 문구를 입력해주세요." required></textarea>
         <div class="counter"><span id="cnt">0</span> / 1000자</div>
         <div class="checklist">
-          게시 가능 여부를 위해 아래를 피해주세요 — <b>외부 링크·URL</b>, <b>유튜브·블로그·카페·인스타·앱</b> 유도, 타 오픈채팅 홍보.
+          모든 문구는 게시 전 <b>검수</b>를 거칩니다. 사기·도박·대출 등 <b>리스크·불법 소지</b> 내용은 게시가 제한될 수 있으니 유의해주세요. <b>외부 링크는 가능</b>합니다.
         </div>
         <div class="alert" id="adAlert">
-          <div class="at">⚠️ <span>검수에서 반려될 수 있는 내용이 감지됐어요</span></div>
+          <div class="at">⚠️ <span>검수 시 확인이 필요한 표현이 있어요</span></div>
           <ul id="adIssues"></ul>
-          그대로 신청은 가능하지만, 방 규칙상 게시가 어려울 수 있어요.
+          신청은 가능하지만, 검수 과정에서 게시가 제한될 수 있으니 한 번 더 확인해주세요.
         </div>
       </div>
       <div class="f">
-        <label class="lab">광고 이미지 (1장)<span class="req">*</span></label>
+        <label class="lab">광고 이미지 <span class="opt">(선택 · 최대 1장)</span></label>
         <label class="drop" id="drop">
           <span class="ic">🖼️</span>
-          <span><span class="dt">이미지 첨부하기</span><span class="dd">JPG·PNG · 5MB 이하 1장</span></span>
-          <input type="file" id="image" accept="image/png,image/jpeg" required>
+          <span><span class="dt">이미지 첨부하기</span><span class="dd">JPG·PNG · 5MB 이하 · 최대 1장</span></span>
+          <input type="file" id="image" accept="image/png,image/jpeg">
         </label>
         <div class="preview" id="preview">
           <img id="pvImg" alt="">
@@ -231,7 +232,7 @@
         <ul>
           <li>모든 게시물은 <b>[광고]</b> 표기로 업로드됩니다.</li>
           <li>문구·이미지는 <b>사전 검수</b> 후 게시됩니다.</li>
-          <li>집광고·앱·유튜브·블로그·카페 등 <b>외부 링크/유도는 게시 불가</b>입니다.</li>
+          <li>사기·도박·대출 등 <b>리스크·불법 소지</b> 콘텐츠는 검수에서 제한될 수 있어요. (외부 링크 자체는 가능)</li>
         </ul>
       </div>
       <label class="agree">
@@ -246,7 +247,7 @@
 <!-- STICKY CTA -->
 <div class="cta" id="cta">
   <div class="cta-in">
-    <div class="sum"><div class="sl">총 결제 예정</div><div class="sp"><span id="sumPrice">55,000원</span><small>VAT 포함</small></div></div>
+    <div class="sum"><div class="sl">총 결제 예정</div><div class="sp"><span id="sumPrice">110,000원</span><small>VAT 포함</small></div></div>
     <button class="btn" id="submit" form="form" type="submit">검수 신청하기</button>
   </div>
 </div>
@@ -268,7 +269,7 @@ const GAS_URL = 'https://script.google.com/macros/s/AKfycbyYw4sd4Fi2Vy5vIHHSRAb2
 const $ = s => document.querySelector(s);
 
 /* 상품 선택 */
-let product = 'A';
+let product = 'B';
 document.querySelectorAll('.plan').forEach(p => p.addEventListener('click', () => {
   document.querySelectorAll('.plan').forEach(x => x.classList.remove('sel'));
   p.classList.add('sel'); product = p.dataset.code;
@@ -284,14 +285,12 @@ $('#phone').addEventListener('input', e => {
 });
 
 /* 광고 문구 글자수 + 검증 */
-const LINK_RE = /(https?:\/\/|www\.|[\w-]+\.(com|net|kr|co\.kr|io|me|gg|link|shop|store|app|page)\b|youtu\.?be|youtube|naver\.me|blog\.naver|cafe\.naver|open\.kakao|instagram|insta\b|t\.me|telegram)/i;
-const KW_RE = /(유튜브|유투브|블로그|카페|인스타|텔레그램|오픈카톡|오픈채팅|어플|앱\s*설치|앱\s*다운|다운로드\s*링크)/;
+const RISK_RE = /(도박|카지노|토토|배팅|베팅|사다리|사기|먹튀|대출|급전|일수|코인\s*리딩|리딩방|투자\s*리딩|불법|유흥|환전|성인)/;
 function checkAd(){
   const t = $('#adText').value;
   $('#cnt').textContent = t.length;
   const issues = [];
-  if (LINK_RE.test(t)) issues.push('외부 링크/URL로 보이는 내용');
-  if (KW_RE.test(t)) issues.push('유튜브·블로그·카페·인스타·앱 등 외부 유도 표현');
+  if (RISK_RE.test(t)) issues.push('사기·도박·대출 등 리스크·불법 소지 표현');
   const al = $('#adAlert'), ta = $('#adText');
   if (issues.length){
     $('#adIssues').innerHTML = issues.map(i => '<li>' + i + '</li>').join('');
@@ -324,7 +323,6 @@ $('#pvRm').addEventListener('click', () => {
 $('#form').addEventListener('submit', async e => {
   e.preventDefault();
   const btn = $('#submit');
-  if (!imageData){ alert('광고 이미지를 첨부해주세요.'); return; }
   if (!$('#agree').checked){ alert('게시 규칙 동의가 필요합니다.'); return; }
   btn.disabled = true; const orig = btn.textContent; btn.textContent = '제출 중...';
   try {
