@@ -3,42 +3,20 @@
 <style>
   *{margin:0;padding:0;box-sizing:border-box;font-family:'Pretendard',sans-serif}
   html,body{width:1080px;height:1080px;overflow:hidden}
-  .frame{width:1080px;height:1080px;position:relative;
-    background:radial-gradient(1200px 700px at 78% -12%,#2B6FE0 0%,#15407F 45%,#0C2A5C 100%);
-    color:#fff;display:flex;flex-direction:column;justify-content:center;padding:96px 92px}
-  .bubble{position:absolute;border-radius:42px 42px 42px 8px;background:rgba(255,255,255,.06)}
-  .b1{width:300px;height:170px;top:90px;right:-40px;transform:rotate(8deg)}
-  .b2{width:200px;height:120px;bottom:120px;left:-30px;border-radius:8px 42px 42px 42px;transform:rotate(-6deg)}
-  .pinflag{position:absolute;top:120px;right:92px;background:#FFB020;color:#15407F;font-weight:800;
-    font-size:30px;padding:16px 28px;border-radius:18px;transform:rotate(4deg);box-shadow:0 14px 30px rgba(0,0,0,.25)}
-  .badge{display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,.12);
-    border:1px solid rgba(255,255,255,.25);padding:14px 26px;border-radius:999px;
-    font-size:30px;font-weight:700;width:fit-content;backdrop-filter:blur(4px)}
-  .title{font-size:96px;font-weight:800;line-height:1.05;margin:42px 0 14px;letter-spacing:-3px}
-  .title .pin{color:#FFC34D}
-  .sub{font-size:38px;font-weight:600;color:#BFD4F5}
-  .price{display:flex;align-items:flex-end;gap:18px;margin:50px 0 8px}
-  .price .num{font-size:128px;font-weight:800;color:#FFC34D;letter-spacing:-4px;line-height:.9}
-  .price .won{font-size:54px;font-weight:800;color:#FFC34D;padding-bottom:14px}
-  .vat{font-size:30px;font-weight:600;color:#9FB8E0;padding-bottom:22px}
-  .room{margin-top:44px;display:flex;align-items:center;gap:14px;font-size:33px;font-weight:600;color:#E6EEFB}
-  .dot{width:12px;height:12px;border-radius:50%;background:#42E29B;box-shadow:0 0 0 6px rgba(66,226,155,.25)}
-  .feats{display:flex;gap:16px;margin-top:38px;flex-wrap:wrap}
-  .chip{font-size:29px;font-weight:700;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.2);
-    padding:16px 26px;border-radius:18px}
-  .chip.hl{background:rgba(255,176,32,.18);border-color:rgba(255,176,32,.5)}
-  .chip b{color:#FFC34D}
+  .frame{width:1080px;height:1080px;background:#1B4DFF;color:#fff;
+    display:flex;flex-direction:column;padding:110px 96px}
+  .logo{font-size:64px;font-weight:900;letter-spacing:-3px;line-height:1}
+  .tagline{font-size:32px;font-weight:600;color:rgba(255,255,255,.80);margin-top:18px}
+  .spacer{flex:1}
+  .title{font-size:152px;font-weight:900;letter-spacing:-7px;line-height:.98}
+  .title .pin{display:block;font-size:104px;color:#FFFFFF;opacity:.92;margin-top:6px}
+  .price{margin-top:40px;font-size:104px;font-weight:900;letter-spacing:-3px}
+  .price .vat{font-size:40px;font-weight:600;color:rgba(255,255,255,.78);margin-left:18px;letter-spacing:0}
 </style></head><body>
 <div class="frame">
-  <div class="bubble b1"></div><div class="bubble b2"></div>
-  <div class="pinflag">📌 공지 고정</div>
-  <div class="badge">📢 고방 오픈카톡방 광고</div>
-  <div class="title">게시 1회<br><span class="pin">+ 공지 고정 24h</span></div>
-  <div class="sub">스폰서 게시 · [광고] 표기 업로드</div>
-  <div class="price"><span class="num">110,000</span><span class="won">원</span><span class="vat">VAT 포함</span></div>
-  <div class="room"><span class="dot"></span>청년 주거·주택·자금 정보방 · 멤버 <b style="color:#fff;margin-left:6px">1,178명</b></div>
-  <div class="feats">
-    <div class="chip hl">📌 <b>공지 상단 고정 24시간</b></div>
-    <div class="chip">✓ 다음날 자정까지 유지</div>
-  </div>
+  <div class="logo">청년정보</div>
+  <div class="tagline">오픈채팅방 광고</div>
+  <div class="spacer"></div>
+  <div class="title">게시 1회<span class="pin">+ 공지 고정 24h</span></div>
+  <div class="price">110,000원<span class="vat">VAT 포함</span></div>
 </div></body></html>
