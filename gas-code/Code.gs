@@ -46,6 +46,19 @@ function checkAccess() {
 
 function productLabel(code) { return code === 'B' ? '게시+공지고정' : '게시1회'; }
 
+/* 광고 문구 자동 검수 — 검수메모(J)에 기록할 플래그 문자열 반환
+   방 규칙: 외부 링크/URL·유튜브·블로그·카페·앱 등 외부 유도 금지 */
+function flagAdText_(text) {
+  var t = String(text || '');
+  var flags = [];
+  var linkRe = /(https?:\/\/|www\.|[\w-]+\.(com|net|kr|co\.kr|io|me|gg|link|shop|store|app|page)\b|youtu\.?be|youtube|naver\.me|blog\.naver|cafe\.naver|open\.kakao|instagram|t\.me|telegram)/i;
+  var kwRe   = /(유튜브|유투브|블로그|카페|인스타|텔레그램|오픈카톡|오픈채팅|어플|앱\s*설치|앱\s*다운|다운로드\s*링크)/;
+  if (linkRe.test(t)) flags.push('링크/URL 의심');
+  if (kwRe.test(t))   flags.push('외부유도 키워드');
+  if (t.replace(/\s/g, '').length < 10) flags.push('문구 과소(10자 미만)');
+  return flags.length ? '⚠️ ' + flags.join(' / ') : '✅ 자동검사 이상 없음';
+}
+
 /* ───────────────────────────────────────────
    신청 폼 저장
    신청 내역(13열):
@@ -60,11 +73,12 @@ function submitForm(formData) {
   var label = productLabel(formData.product);
   var imageUrl = '';
   if (formData.imageData) imageUrl = saveImageToDrive(formData);
+  var memo = flagAdText_(formData.adText);  // 광고문구 자동 검수 플래그
 
   sheet.appendRow([
     now, '', formData.company || '', formData.phone || '', label,
     formData.adText || '', imageUrl, formData.publishDate || '',
-    formData.bizInfo || '', '', '발송대기', '', '대기'
+    '', memo, '발송대기', '', '대기'
   ]);
   var r = sheet.getLastRow();
   sheet.getRange(r, 11).setValue('발송대기');
@@ -80,7 +94,7 @@ function submitForm(formData) {
       '게시희망일: ' + (formData.publishDate || ''),
       '광고문구:\n' + (formData.adText || ''),
       '이미지: ' + imageUrl,
-      '사업자정보: ' + (formData.bizInfo || ''),
+      '자동검수: ' + memo,
       '▶ 시트: https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID
     ].join('\n'));
   } catch (mailErr) {}

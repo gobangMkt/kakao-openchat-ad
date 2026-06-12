@@ -1,9 +1,32 @@
 :root{
-  --gobang-primary:#1B64DA;   /* 고방 블루 */
-  --gobang-dark:#0F2E66;
-  --gobang-accent:#FFB020;
-  --bg:#F7F9FC; --surface:#FFFFFF; --text:#1A2233; --muted:#6B7588;
-  --border:#E3E8F0; --radius:14px;
+  /* 청년정보 BI — 비비드 블루 */
+  --blue:#1B4DFF;
+  --blue-press:#163FD6;
+  --blue-deep:#0B2EAE;
+  --blue-50:#EEF3FF;
+  --blue-100:#DCE7FF;
+  --blue-ring:rgba(27,77,255,.16);
+
+  --ink:#0E1525;
+  --ink-2:#3A4760;
+  --muted:#7E8AA6;
+
+  --bg:#F3F6FD;
+  --surface:#FFFFFF;
+  --border:#E5EBF7;
+  --border-strong:#D3DCF0;
+
+  --gold:#FFC838;
+  --danger:#E5484D;
+  --good:#1FB07A;
+
+  --r-sm:12px; --r:18px; --r-lg:26px;
+  --sh-sm:0 2px 8px rgba(20,40,90,.05);
+  --sh:0 12px 30px rgba(20,40,90,.08);
+  --sh-blue:0 14px 28px rgba(27,77,255,.30);
+
   --font:'Pretendard',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 }
-*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font)}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);-webkit-font-smoothing:antialiased}

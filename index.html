@@ -1,106 +1,346 @@
 <!doctype html><html lang="ko"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>고방 오픈카톡방 광고 신청</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>청년정보 오픈채팅방 광고 신청</title>
+<meta name="description" content="청년 주거·주택 정보방에 광고를 노출하세요. 스폰서 게시 신청.">
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
 <link rel="stylesheet" href="colors_and_type.css">
 <style>
-  .wrap{max-width:640px;margin:0 auto;padding:24px 18px 80px}
-  .hero{background:var(--gobang-dark);color:#fff;border-radius:var(--radius);padding:28px 24px;margin-bottom:20px}
-  .hero h1{margin:0 0 6px;font-size:22px} .hero p{margin:0;color:#C7D4EC;font-size:14px}
-  .plans{display:grid;gap:12px;margin:18px 0}
-  .plan{border:2px solid var(--border);border-radius:var(--radius);padding:16px;background:var(--surface);cursor:pointer;display:flex;justify-content:space-between;align-items:center}
-  .plan.sel{border-color:var(--gobang-primary);box-shadow:0 0 0 3px rgba(27,100,218,.12)}
-  .plan .price{font-weight:700;color:var(--gobang-primary);white-space:nowrap;margin-left:12px}
-  label{display:block;font-size:13px;font-weight:600;margin:14px 0 6px}
-  input,textarea{width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;font-family:inherit;font-size:15px}
-  textarea{min-height:120px;resize:vertical}
-  .req::after{content:' *';color:#E53935}
-  .btn{width:100%;padding:15px;border:0;border-radius:12px;background:var(--gobang-primary);color:#fff;font-size:16px;font-weight:700;margin-top:22px;cursor:pointer}
-  .btn:disabled{opacity:.5}
-  .note{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.6}
-  .done{text-align:center;padding:60px 20px;display:none}
-  .done.show{display:block} .form.hide{display:none}
-  .rules{background:#FFF6E5;border-radius:10px;padding:12px;font-size:12px;color:#8a6d3b;margin-top:8px;line-height:1.6}
+  body{padding-bottom:120px}
+  .wrap{max-width:560px;margin:0 auto}
+
+  /* ── HERO ── */
+  .hero{position:relative;overflow:hidden;background:var(--blue);color:#fff;
+    padding:54px 28px 40px;border-radius:0 0 30px 30px}
+  .hero::before,.hero::after{content:"";position:absolute;border-radius:40px 40px 40px 10px;
+    background:rgba(255,255,255,.08);pointer-events:none}
+  .hero::before{width:230px;height:140px;top:-30px;right:-50px;transform:rotate(10deg)}
+  .hero::after{width:150px;height:96px;bottom:-26px;left:-30px;border-radius:10px 40px 40px 40px;transform:rotate(-8deg)}
+  .hero .logo{font-size:30px;font-weight:900;letter-spacing:-1.5px;line-height:1;position:relative}
+  .hero h1{position:relative;margin:22px 0 10px;font-size:34px;font-weight:900;letter-spacing:-1.6px;line-height:1.2}
+  .hero p{position:relative;margin:0;font-size:15px;font-weight:500;color:rgba(255,255,255,.86);line-height:1.6}
+  .room-link{position:relative;display:inline-flex;align-items:center;gap:7px;margin-top:18px;
+    background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.32);color:#fff;text-decoration:none;
+    font-size:13.5px;font-weight:700;padding:11px 16px;border-radius:12px;transition:.15s;backdrop-filter:blur(4px)}
+  .room-link:hover{background:rgba(255,255,255,.26)}
+  .room-link span{transition:.18s}
+  .room-link:hover span{transform:translateX(3px)}
+
+  /* ── SECTIONS ── */
+  .body{padding:26px 20px 0}
+  .sec{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);
+    padding:22px 20px;margin-bottom:16px;box-shadow:var(--sh-sm)}
+  .sec-h{display:flex;align-items:center;gap:10px;margin:0 0 16px}
+  .sec-n{flex:none;width:26px;height:26px;border-radius:9px;background:var(--blue-50);color:var(--blue);
+    font-size:14px;font-weight:800;display:grid;place-items:center}
+  .sec-t{font-size:17px;font-weight:800;letter-spacing:-.5px}
+
+  /* ── PLAN CARDS ── */
+  .plan{position:relative;display:flex;align-items:center;gap:14px;width:100%;text-align:left;
+    border:1.5px solid var(--border-strong);background:#fff;border-radius:var(--r);padding:18px 16px;
+    cursor:pointer;transition:.18s ease;margin-bottom:12px;font-family:inherit}
+  .plan:last-child{margin-bottom:0}
+  .plan:active{transform:scale(.99)}
+  .plan.sel{border-color:var(--blue);background:var(--blue-50);box-shadow:0 0 0 4px var(--blue-ring)}
+  .plan .radio{flex:none;width:24px;height:24px;border-radius:50%;border:2px solid var(--border-strong);
+    transition:.18s;display:grid;place-items:center}
+  .plan.sel .radio{border-color:var(--blue);background:var(--blue)}
+  .plan .radio::after{content:"";width:9px;height:9px;border-radius:50%;background:#fff;transform:scale(0);transition:.18s}
+  .plan.sel .radio::after{transform:scale(1)}
+  .plan .info{flex:1;min-width:0}
+  .plan .nm{font-size:16px;font-weight:800;letter-spacing:-.4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .plan .desc{font-size:12.5px;color:var(--muted);margin-top:4px;line-height:1.5}
+  .plan .price{flex:none;font-size:19px;font-weight:900;letter-spacing:-.6px;color:var(--ink)}
+  .plan.sel .price{color:var(--blue)}
+  .badge-best{font-size:11px;font-weight:800;color:#7A5600;background:var(--gold);
+    padding:3px 9px;border-radius:7px;letter-spacing:.3px}
+
+  /* ── FIELDS ── */
+  .f{margin-bottom:16px}
+  .f:last-child{margin-bottom:0}
+  .lab{display:block;font-size:13.5px;font-weight:700;color:var(--ink-2);margin-bottom:8px}
+  .lab .req{color:var(--blue);margin-left:2px}
+  .inp,.ta{width:100%;border:1.5px solid var(--border-strong);background:#fff;border-radius:var(--r-sm);
+    padding:14px 15px;font-size:15.5px;font-family:inherit;color:var(--ink);transition:.15s;-webkit-appearance:none}
+  .inp::placeholder,.ta::placeholder{color:#A9B3C9}
+  .inp:focus,.ta:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 4px var(--blue-ring)}
+  .ta{min-height:140px;resize:vertical;line-height:1.6}
+  .ta.warn{border-color:var(--gold);box-shadow:0 0 0 4px rgba(255,200,56,.2)}
+  .counter{text-align:right;font-size:12px;color:var(--muted);margin-top:6px}
+
+  /* ── AD-TEXT VALIDATION ── */
+  .checklist{margin-top:10px;font-size:12.5px;color:var(--muted);line-height:1.9}
+  .checklist b{color:var(--ink-2)}
+  .alert{display:none;margin-top:10px;border:1px solid #F4D58A;background:#FFF8E6;border-radius:12px;
+    padding:12px 14px;font-size:13px;color:#8A6400;line-height:1.6}
+  .alert.show{display:block}
+  .alert .at{font-weight:800;display:flex;align-items:center;gap:6px;margin-bottom:4px}
+  .alert ul{margin:4px 0 0;padding-left:18px}
+
+  /* ── FILE DROPZONE ── */
+  .drop{display:flex;align-items:center;gap:14px;border:1.5px dashed var(--border-strong);background:#FAFBFF;
+    border-radius:var(--r);padding:16px;cursor:pointer;transition:.15s}
+  .drop:hover{border-color:var(--blue);background:var(--blue-50)}
+  .drop .ic{flex:none;width:46px;height:46px;border-radius:12px;background:var(--blue-50);
+    display:grid;place-items:center;font-size:22px}
+  .drop .dt{font-size:14px;font-weight:700;color:var(--ink-2)}
+  .drop .dd{font-size:12px;color:var(--muted);margin-top:3px}
+  .drop input{display:none}
+  .preview{display:none;align-items:center;gap:14px;border:1.5px solid var(--border-strong);
+    border-radius:var(--r);padding:12px;background:#fff}
+  .preview.show{display:flex}
+  .preview img{width:64px;height:64px;border-radius:12px;object-fit:cover;flex:none;background:#eee}
+  .preview .pn{flex:1;min-width:0;font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .preview .ps{font-size:12px;color:var(--muted);margin-top:2px}
+  .preview .rm{flex:none;border:none;background:#F1F4FB;color:var(--ink-2);font-size:13px;font-weight:700;
+    border-radius:9px;padding:8px 12px;cursor:pointer;font-family:inherit}
+
+  /* ── NOTICE ── */
+  .notice{border:1px solid var(--border);background:var(--blue-50);border-radius:var(--r);padding:16px 18px}
+  .notice h4{margin:0 0 8px;font-size:14px;font-weight:800;color:var(--blue-deep);display:flex;gap:7px;align-items:center}
+  .notice ul{margin:0;padding-left:18px;font-size:12.8px;color:var(--ink-2);line-height:1.85}
+
+  /* ── AGREE ── */
+  .agree{display:flex;gap:11px;align-items:flex-start;padding:16px 4px 4px;font-size:14px;color:var(--ink-2);cursor:pointer}
+  .agree input{position:absolute;opacity:0;width:0;height:0}
+  .agree .box{flex:none;width:24px;height:24px;border-radius:8px;border:2px solid var(--border-strong);
+    transition:.15s;display:grid;place-items:center;margin-top:-1px}
+  .agree input:checked + .box{background:var(--blue);border-color:var(--blue)}
+  .agree .box svg{opacity:0;transition:.15s}
+  .agree input:checked + .box svg{opacity:1}
+
+  /* ── STICKY CTA ── */
+  .cta{position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(255,255,255,.86);
+    backdrop-filter:saturate(180%) blur(14px);border-top:1px solid var(--border);
+    padding:12px 16px calc(12px + env(safe-area-inset-bottom));display:flex;justify-content:center}
+  .cta-in{width:100%;max-width:560px;display:flex;align-items:center;gap:14px}
+  .cta .sum{flex:1;min-width:0}
+  .cta .sum .sl{font-size:11.5px;color:var(--muted);font-weight:600}
+  .cta .sum .sp{font-size:21px;font-weight:900;letter-spacing:-.6px;color:var(--ink)}
+  .cta .sum .sp small{font-size:12px;font-weight:600;color:var(--muted);margin-left:5px}
+  .btn{flex:none;border:none;background:var(--blue);color:#fff;font-family:inherit;font-size:16px;font-weight:800;
+    letter-spacing:-.3px;padding:16px 26px;border-radius:15px;cursor:pointer;box-shadow:var(--sh-blue);transition:.15s}
+  .btn:hover{background:var(--blue-press)}
+  .btn:active{transform:translateY(1px)}
+  .btn:disabled{opacity:.55;box-shadow:none;cursor:default}
+
+  /* ── SUCCESS ── */
+  .done{display:none;padding:70px 28px;text-align:center}
+  .done.show{display:block}
+  .check{width:84px;height:84px;border-radius:50%;background:var(--blue);margin:0 auto 22px;
+    display:grid;place-items:center;box-shadow:var(--sh-blue);animation:pop .45s cubic-bezier(.2,.8,.3,1.3)}
+  @keyframes pop{0%{transform:scale(.4);opacity:0}100%{transform:scale(1);opacity:1}}
+  .done h2{font-size:25px;font-weight:900;letter-spacing:-1px;margin:0 0 10px}
+  .done .sub{font-size:14.5px;color:var(--ink-2);line-height:1.7;margin:0 auto;max-width:380px}
+  .steps{margin:30px auto 0;max-width:360px;text-align:left;background:#fff;border:1px solid var(--border);
+    border-radius:var(--r-lg);padding:20px;box-shadow:var(--sh-sm)}
+  .stp{display:flex;gap:14px;align-items:flex-start;padding:10px 0}
+  .stp .sn{flex:none;width:30px;height:30px;border-radius:50%;background:var(--blue-50);color:var(--blue);
+    font-weight:800;font-size:14px;display:grid;place-items:center}
+  .stp .st{font-size:14.5px;font-weight:700}
+  .stp .sd{font-size:12.5px;color:var(--muted);margin-top:2px;line-height:1.5}
+
+  /* ── entrance ── */
+  .reveal{opacity:0;transform:translateY(14px);animation:up .5s ease forwards}
+  @keyframes up{to{opacity:1;transform:none}}
 </style></head><body>
 <div class="wrap">
-  <div class="hero">
-    <h1>고방 오픈카톡방 광고 신청</h1>
-    <p>청년 주거·주택·자금 지원 정보방 · 스폰서 게시</p>
-  </div>
+  <!-- HERO -->
+  <header class="hero reveal" style="animation-delay:.02s">
+    <div class="logo">청년정보</div>
+    <h1>오픈채팅방 광고 신청</h1>
+    <p>청년 주거·주택·자금 정보방에 광고를 노출하세요.<br>문구·이미지 검수 후 [광고] 표기로 게시됩니다.</p>
+    <a class="room-link" href="https://open.kakao.com/o/gspAuZ5" target="_blank" rel="noopener">💬 오픈채팅방 바로가기 <span aria-hidden="true">→</span></a>
+  </header>
 
-  <form id="form" class="form">
-    <div class="plans">
-      <div class="plan sel" data-code="A">
-        <div><strong>게시 1회</strong><div class="note">[광고] 표기 업로드 · 다음날 자정까지 유지</div></div>
-        <div class="price">55,000원</div>
-      </div>
-      <div class="plan" data-code="B">
-        <div><strong>게시 1회 + 공지 고정 24h</strong><div class="note">공지 상단 고정 24시간</div></div>
-        <div class="price">110,000원</div>
-      </div>
-    </div>
+  <form id="form" class="body">
+    <!-- 1. 상품 -->
+    <section class="sec reveal" style="animation-delay:.08s">
+      <div class="sec-h"><span class="sec-n">1</span><span class="sec-t">상품 선택</span></div>
+      <button type="button" class="plan sel" data-code="A" data-price="55,000">
+        <span class="radio"></span>
+        <span class="info"><span class="nm">게시 1회</span><span class="desc">[광고] 표기 업로드 · 다음날 자정까지 노출 유지</span></span>
+        <span class="price">55,000원</span>
+      </button>
+      <button type="button" class="plan" data-code="B" data-price="110,000">
+        <span class="radio"></span>
+        <span class="info"><span class="nm">게시 1회 + 공지 고정 24h <span class="badge-best">BEST</span></span><span class="desc">게시 + 채팅방 공지 상단 24시간 고정</span></span>
+        <span class="price">110,000원</span>
+      </button>
+    </section>
 
-    <label class="req">상호 / 광고주명</label>
-    <input id="company" required>
-    <label class="req">연락처 (휴대폰)</label>
-    <input id="phone" type="tel" placeholder="010-0000-0000" required>
-    <label class="req">광고 문구</label>
-    <textarea id="adText" required placeholder="게시할 광고 문구를 입력해주세요. ([광고] 표기로 업로드됩니다)"></textarea>
-    <label class="req">광고 이미지 (1장)</label>
-    <input id="image" type="file" accept="image/png,image/jpeg" required>
-    <div class="note">jpg/png, 5MB 이하 1장</div>
-    <label class="req">게시 희망일</label>
-    <input id="publishDate" type="date" required>
-    <label>사업자 정보 (세금계산서용 · 선택)</label>
-    <input id="bizInfo" placeholder="상호 / 사업자번호 / 이메일">
-    <div class="rules">
-      ⚠️ 방 규칙: 집광고·어플·유튜브·블로그·카페 등 외부 링크 언급 게시물은 게시 불가합니다. 문구·이미지는 사전 검수 후 [광고] 표기로 업로드됩니다.
-    </div>
-    <label style="display:flex;gap:8px;align-items:center;font-weight:400;margin-top:12px">
-      <input type="checkbox" id="agree" style="width:auto" required> 위 방 규칙에 동의합니다.
-    </label>
-    <button class="btn" id="submit" type="submit">검수 신청하기</button>
-    <div class="note">신청 후 검수(보통 1영업일) → 통과 시 카카오 알림톡으로 결제링크를 보내드립니다. (VAT 포함 금액)</div>
+    <!-- 2. 광고주 정보 -->
+    <section class="sec reveal" style="animation-delay:.14s">
+      <div class="sec-h"><span class="sec-n">2</span><span class="sec-t">광고주 정보</span></div>
+      <div class="f">
+        <label class="lab" for="company">상호 / 광고주명<span class="req">*</span></label>
+        <input class="inp" id="company" autocomplete="organization" placeholder="예) 홍길동 부동산" required>
+      </div>
+      <div class="f">
+        <label class="lab" for="phone">연락처 (휴대폰)<span class="req">*</span></label>
+        <input class="inp" id="phone" type="tel" inputmode="numeric" autocomplete="tel" placeholder="010-0000-0000" maxlength="13" required>
+        <div class="counter" style="text-align:left;color:var(--muted)">검수 통과 시 이 번호로 결제링크를 보내드립니다.</div>
+      </div>
+    </section>
+
+    <!-- 3. 광고 내용 -->
+    <section class="sec reveal" style="animation-delay:.2s">
+      <div class="sec-h"><span class="sec-n">3</span><span class="sec-t">광고 내용</span></div>
+      <div class="f">
+        <label class="lab" for="adText">광고 문구<span class="req">*</span></label>
+        <textarea class="ta" id="adText" maxlength="1000" placeholder="게시할 광고 문구를 입력해주세요." required></textarea>
+        <div class="counter"><span id="cnt">0</span> / 1000자</div>
+        <div class="checklist">
+          게시 가능 여부를 위해 아래를 피해주세요 — <b>외부 링크·URL</b>, <b>유튜브·블로그·카페·인스타·앱</b> 유도, 타 오픈채팅 홍보.
+        </div>
+        <div class="alert" id="adAlert">
+          <div class="at">⚠️ <span>검수에서 반려될 수 있는 내용이 감지됐어요</span></div>
+          <ul id="adIssues"></ul>
+          그대로 신청은 가능하지만, 방 규칙상 게시가 어려울 수 있어요.
+        </div>
+      </div>
+      <div class="f">
+        <label class="lab">광고 이미지 (1장)<span class="req">*</span></label>
+        <label class="drop" id="drop">
+          <span class="ic">🖼️</span>
+          <span><span class="dt">이미지 첨부하기</span><span class="dd">JPG·PNG · 5MB 이하 1장</span></span>
+          <input type="file" id="image" accept="image/png,image/jpeg" required>
+        </label>
+        <div class="preview" id="preview">
+          <img id="pvImg" alt="">
+          <div style="flex:1;min-width:0"><div class="pn" id="pvName"></div><div class="ps" id="pvSize"></div></div>
+          <button type="button" class="rm" id="pvRm">변경</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. 게시 희망일 -->
+    <section class="sec reveal" style="animation-delay:.26s">
+      <div class="sec-h"><span class="sec-n">4</span><span class="sec-t">게시 희망일</span></div>
+      <div class="f">
+        <input class="inp" id="publishDate" type="date" required>
+        <div class="counter" style="text-align:left;color:var(--muted)">검수·결제 완료 후 협의해 확정합니다.</div>
+      </div>
+    </section>
+
+    <!-- NOTICE + AGREE -->
+    <section class="sec reveal" style="animation-delay:.32s;padding:0;border:none;background:none;box-shadow:none">
+      <div class="notice">
+        <h4>📌 게시 규칙 안내</h4>
+        <ul>
+          <li>모든 게시물은 <b>[광고]</b> 표기로 업로드됩니다.</li>
+          <li>문구·이미지는 <b>사전 검수</b> 후 게시됩니다.</li>
+          <li>집광고·앱·유튜브·블로그·카페 등 <b>외부 링크/유도는 게시 불가</b>입니다.</li>
+        </ul>
+      </div>
+      <label class="agree">
+        <input type="checkbox" id="agree" required>
+        <span class="box"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span>위 게시 규칙을 확인했으며, 검수 후 게시되는 것에 동의합니다.</span>
+      </label>
+    </section>
   </form>
+</div>
 
-  <div class="done" id="done">
-    <h2>✅ 신청이 접수됐어요</h2>
-    <p class="note">검수 후 통과되면 입력하신 연락처로 결제링크를 보내드립니다.</p>
+<!-- STICKY CTA -->
+<div class="cta" id="cta">
+  <div class="cta-in">
+    <div class="sum"><div class="sl">총 결제 예정</div><div class="sp"><span id="sumPrice">55,000원</span><small>VAT 포함</small></div></div>
+    <button class="btn" id="submit" form="form" type="submit">검수 신청하기</button>
   </div>
 </div>
 
+<!-- SUCCESS -->
+<div class="wrap"><div class="done" id="done">
+  <div class="check"><svg width="40" height="40" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  <h2>신청이 접수됐어요</h2>
+  <p class="sub">문구·이미지 검수 후, 입력하신 연락처로 결제링크를 보내드립니다. 결제 완료 후 협의된 날짜에 게시됩니다.</p>
+  <div class="steps">
+    <div class="stp"><span class="sn">1</span><div><div class="st">검수</div><div class="sd">방 규칙에 맞는지 확인 (보통 1영업일)</div></div></div>
+    <div class="stp"><span class="sn">2</span><div><div class="st">결제링크 발송</div><div class="sd">카카오/문자로 토스 결제링크 전달</div></div></div>
+    <div class="stp"><span class="sn">3</span><div><div class="st">게시</div><div class="sd">[광고] 표기로 협의된 날짜에 업로드</div></div></div>
+  </div>
+</div></div>
+
 <script>
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbyYw4sd4Fi2Vy5vIHHSRAb2tb_xuzYpoEyrtrjVrLMJ__Z7KQ5suQiQ11Jy-Kpns2ePdw/exec';
+const $ = s => document.querySelector(s);
+
+/* 상품 선택 */
 let product = 'A';
 document.querySelectorAll('.plan').forEach(p => p.addEventListener('click', () => {
   document.querySelectorAll('.plan').forEach(x => x.classList.remove('sel'));
   p.classList.add('sel'); product = p.dataset.code;
+  $('#sumPrice').textContent = p.dataset.price + '원';
 }));
 
-function fileToDataURL(file){ return new Promise((res,rej)=>{
-  const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); }); }
+/* 연락처 자동 하이픈 */
+$('#phone').addEventListener('input', e => {
+  let v = e.target.value.replace(/[^0-9]/g, '').slice(0, 11);
+  if (v.length < 4) e.target.value = v;
+  else if (v.length < 8) e.target.value = v.slice(0,3) + '-' + v.slice(3);
+  else e.target.value = v.slice(0,3) + '-' + v.slice(3,7) + '-' + v.slice(7);
+});
 
-document.getElementById('form').addEventListener('submit', async (e) => {
+/* 광고 문구 글자수 + 검증 */
+const LINK_RE = /(https?:\/\/|www\.|[\w-]+\.(com|net|kr|co\.kr|io|me|gg|link|shop|store|app|page)\b|youtu\.?be|youtube|naver\.me|blog\.naver|cafe\.naver|open\.kakao|instagram|insta\b|t\.me|telegram)/i;
+const KW_RE = /(유튜브|유투브|블로그|카페|인스타|텔레그램|오픈카톡|오픈채팅|어플|앱\s*설치|앱\s*다운|다운로드\s*링크)/;
+function checkAd(){
+  const t = $('#adText').value;
+  $('#cnt').textContent = t.length;
+  const issues = [];
+  if (LINK_RE.test(t)) issues.push('외부 링크/URL로 보이는 내용');
+  if (KW_RE.test(t)) issues.push('유튜브·블로그·카페·인스타·앱 등 외부 유도 표현');
+  const al = $('#adAlert'), ta = $('#adText');
+  if (issues.length){
+    $('#adIssues').innerHTML = issues.map(i => '<li>' + i + '</li>').join('');
+    al.classList.add('show'); ta.classList.add('warn');
+  } else { al.classList.remove('show'); ta.classList.remove('warn'); }
+}
+$('#adText').addEventListener('input', checkAd);
+
+/* 이미지 첨부 + 프리뷰 */
+let imageData = '', imageName = '';
+function bytes(n){ return n < 1048576 ? (n/1024).toFixed(0)+'KB' : (n/1048576).toFixed(1)+'MB'; }
+$('#image').addEventListener('change', e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  if (f.size > 5*1024*1024){ alert('이미지는 5MB 이하 1장만 가능합니다.'); e.target.value=''; return; }
+  const r = new FileReader();
+  r.onload = () => {
+    imageData = r.result; imageName = f.name;
+    $('#pvImg').src = r.result; $('#pvName').textContent = f.name; $('#pvSize').textContent = bytes(f.size);
+    $('#drop').style.display = 'none'; $('#preview').classList.add('show');
+  };
+  r.readAsDataURL(f);
+});
+$('#pvRm').addEventListener('click', () => {
+  imageData=''; imageName=''; $('#image').value='';
+  $('#preview').classList.remove('show'); $('#drop').style.display='flex';
+});
+
+/* 제출 */
+$('#form').addEventListener('submit', async e => {
   e.preventDefault();
-  const btn = document.getElementById('submit');
-  const file = document.getElementById('image').files[0];
-  if (file && file.size > 5*1024*1024) { alert('이미지는 5MB 이하 1장만 가능합니다.'); return; }
-  btn.disabled = true; btn.textContent = '제출 중...';
+  const btn = $('#submit');
+  if (!imageData){ alert('광고 이미지를 첨부해주세요.'); return; }
+  if (!$('#agree').checked){ alert('게시 규칙 동의가 필요합니다.'); return; }
+  btn.disabled = true; const orig = btn.textContent; btn.textContent = '제출 중...';
   try {
-    const imageData = file ? await fileToDataURL(file) : '';
     const body = {
       action:'submitForm', product,
-      company: company.value.trim(), phone: phone.value.trim(),
-      adText: adText.value.trim(), publishDate: publishDate.value,
-      bizInfo: bizInfo.value.trim(), imageData, imageName: file ? file.name : ''
+      company: $('#company').value.trim(), phone: $('#phone').value.trim(),
+      adText: $('#adText').value.trim(), publishDate: $('#publishDate').value,
+      imageData, imageName
     };
     const r = await fetch(GAS_URL, { method:'POST', body: JSON.stringify(body) });
     const j = await r.json();
-    if (j.success) {
-      document.getElementById('form').classList.add('hide');
-      document.getElementById('done').classList.add('show');
-    } else { alert('제출 실패: ' + (j.error || j.reason || '다시 시도해주세요')); btn.disabled=false; btn.textContent='검수 신청하기'; }
-  } catch (err) { alert('네트워크 오류. 다시 시도해주세요.'); btn.disabled=false; btn.textContent='검수 신청하기'; }
+    if (j.success){
+      $('#form').style.display='none'; $('#cta').style.display='none';
+      document.querySelector('.hero').style.display='none';
+      $('#done').classList.add('show'); window.scrollTo(0,0);
+    } else { alert('제출 실패: ' + (j.error || j.reason || '다시 시도해주세요')); btn.disabled=false; btn.textContent=orig; }
+  } catch(err){ alert('네트워크 오류. 다시 시도해주세요.'); btn.disabled=false; btn.textContent=orig; }
 });
 </script></body></html>
