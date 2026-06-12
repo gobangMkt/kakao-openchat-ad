@@ -241,14 +241,14 @@ function setupSheets() {
   Logger.log('시트 초기화 완료');
 }
 
-/* 기존 설정 시트에 알림 이메일 2행(4·5) 라벨+기본값 보정 — 1회 실행 */
+/* 설정 시트에 알림 이메일 행(4·5) 라벨 추가 — 1회 실행.
+   B4=신청접수 수신자, B5=결제완료 수신자. 값은 사용자가 직접 입력. */
 function setupEmails() {
   var s = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('설정');
   s.getRange(4, 1).setValue('신청접수 알림 이메일');
   if (!String(s.getRange(4, 2).getValue()).trim()) s.getRange(4, 2).setValue('archoit94@neoflat.net');
-  s.getRange(5, 1).setValue('결제완료 알림 이메일');
-  if (!String(s.getRange(5, 2).getValue()).trim()) s.getRange(5, 2).setValue('lneleovvnae@neoflat.net');
-  Logger.log('알림 이메일 설정 갱신 완료 (신청접수=B4, 결제완료=B5)');
+  s.getRange(5, 1).setValue('결제완료 알림 이메일');   // B5에 결제완료 수신자 직접 입력
+  Logger.log('알림 이메일 라벨 추가 완료 — 결제완료 수신자를 B5에 입력하세요');
 }
 
 function setupDropdowns() {
