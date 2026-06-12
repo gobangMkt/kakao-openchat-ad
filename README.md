@@ -13,15 +13,18 @@
 
 ## 실행 / 배포
 - **로컬 미리보기**: `시작 8080.bat` → `http://localhost:8080`
-- **신청폼 배포**: GitHub Pages (`main` push 자동) — `https://gobangmkt.github.io/gobang_ad_request/`
-- **백엔드(GAS)**: `gas-code/`에서 `clasp push` → `clasp deploy` → `/exec` URL을 `index.html`의 `GAS_URL`에 기입.
-- **바인딩 시트**: `18_OqLH7IuTznPL7gmhC-bfFeS9n28hIL6-fQy089Qxc`
+- **신청폼 배포**: GitHub Pages (`master` push 자동) — `https://gobangmkt.github.io/kakao-openchat-ad/`
+- **백엔드(GAS)**: clasp로 배포 완료. 재배포 시 `gas-code/`에서 `clasp push` → `clasp create-deployment`.
+  - scriptId `1sgpvphwXyq5iNram5nIM8sENe7rwMYVZkUhR4jKZW0b0r3Wd7d10J5Dn`
+  - 웹앱 `/exec` (index.html `GAS_URL`에 반영됨): `https://script.google.com/macros/s/AKfycbx4XYws7n2YJUsib-6kRzOCdivAL9moaNXMjGKPIIAFhRYKmkDzkgopyRuhlJpgg30E/exec`
+  - ⚠️ clasp가 기존 시트에 바인딩 못 해 빈 컨테이너 시트(`1opKfQ…`)가 자동생성됨. 코드는 `openById('18_Oq…')`로 실제 시트를 직접 지정하므로 무관(빈 시트는 방치 가능).
+- **바인딩(실데이터) 시트**: `18_OqLH7IuTznPL7gmhC-bfFeS9n28hIL6-fQy089Qxc`
 - **시크릿 (GAS Script Property, 값 미기재)**: `SOLAPI_API_KEY` · `SOLAPI_API_SECRET` · `SOLAPI_PF_ID`. 토스 결제링크는 `Code.gs` 상수 `PAY_LINK_BASIC/PIN` + 알림톡 템플릿 버튼.
-- **초기화**: GAS 편집기에서 `setupSheets()` → `setupTrigger()` 1회 실행.
+- **초기화**: GAS 편집기에서 `setupSheets()` → `setupTrigger()` 1회 실행(최초 실행 시 권한 승인).
 
 ## 배포링크
-- 신청폼(예정): `https://gobangmkt.github.io/gobang_ad_request/` — **배포 후 URL 갱신**
-- GitHub repo(예정): `https://github.com/gobangMkt/gobang_ad_request`
+- 신청폼: `https://gobangmkt.github.io/kakao-openchat-ad/`
+- GitHub repo: `https://github.com/gobangMkt/kakao-openchat-ad`
 - 노션 허브: "고방 광고상품" (`6703826995438395956001d30bc52f09`) — 관련 URL·결제링크 상품내용 단일 진실 소스
 
 ## 운영자 선행작업 (코드와 별개)
