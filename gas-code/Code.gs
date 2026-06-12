@@ -1,13 +1,13 @@
 var SPREADSHEET_ID = '18_OqLH7IuTznPL7gmhC-bfFeS9n28hIL6-fQy089Qxc';
 var DRIVE_FOLDER_NAME = '고방광고_신청이미지';
 
-// SOLAPI 템플릿 (등록 후 채움) — 토스링크는 버튼에 박힘 (빌리투어 방식)
-var TEMPLATE_PAYMENT_BASIC = '';  // 게시1회 결제요청
-var TEMPLATE_PAYMENT_PIN   = '';  // 게시+공지고정 결제요청
+// SOLAPI 알림톡 템플릿 ID는 Script Property에 저장 (SOLAPI_TPL_BASIC / SOLAPI_TPL_PIN)
+// API 키도 Script Property (SOLAPI_API_KEY / SOLAPI_API_SECRET / SOLAPI_PF_ID)
+// 토스 결제링크는 알림톡 템플릿 '버튼(웹링크)'에 직접 박음 (빌리투어 방식)
 
-// 토스 결제링크 (생성 후 채움) — 참고용
-var PAY_LINK_BASIC = 'https://s.tosspayments.com/BnrvwJX8Jsg';  // 게시1회 55,000
-var PAY_LINK_PIN   = 'https://s.tosspayments.com/BnrvjvvM6g1';  // 게시+공지고정 110,000
+// 토스 결제링크 (참고용 — 템플릿 버튼에 사용)
+var PAY_LINK_BASIC = 'https://s.tosspayments.com/BnrvwJX8Jsg';  // 게시1회 (50,000 + VAT)
+var PAY_LINK_PIN   = 'https://s.tosspayments.com/BnrvjvvM6g1';  // 게시+공지고정 (100,000 + VAT)
 
 /* ───────────────────────────────────────────
    설정 시트 (A=라벨, B=값)
@@ -149,6 +149,24 @@ function sendAlimtalk(to, templateId, variables) {
   return res;
 }
 
+/* SOLAPI 설정 점검 — 속성 SET/MISSING 로그 (값 미노출) */
+function checkSolapiConfig() {
+  var p = PropertiesService.getScriptProperties();
+  ['SOLAPI_API_KEY', 'SOLAPI_API_SECRET', 'SOLAPI_PF_ID', 'SOLAPI_TPL_BASIC', 'SOLAPI_TPL_PIN'].forEach(function(k) {
+    Logger.log(k + ': ' + (p.getProperty(k) ? 'SET' : 'MISSING'));
+  });
+}
+
+/* 알림톡 테스트 발송 — Script Property SOLAPI_TEST_PHONE 번호로 게시1회 템플릿 발송 */
+function testAlimtalk() {
+  var p = PropertiesService.getScriptProperties();
+  var to = p.getProperty('SOLAPI_TEST_PHONE');
+  var tpl = p.getProperty('SOLAPI_TPL_BASIC');
+  if (!to || !tpl) { Logger.log('SOLAPI_TEST_PHONE / SOLAPI_TPL_BASIC 설정 필요'); return; }
+  var res = sendAlimtalk(to, tpl, { '#{신청자}': '테스트' });
+  Logger.log('테스트 발송 응답: ' + res.getContentText());
+}
+
 /* ───────────────────────────────────────────
    onEdit — 신청 내역 K열(11) '발송하기' → 결제링크 알림톡
 ─────────────────────────────────────────── */
@@ -192,7 +210,15 @@ function handlePaymentSend(e, sheet, row) {
   var company = String(rowData[2] || '').trim();          // C 상호
   var phone   = String(rowData[3]).replace(/[^0-9]/g, ''); // D 연락처
   var label   = String(rowData[4] || '').trim();           // E 상품선택
-  var templateId = label === '게시+공지고정' ? TEMPLATE_PAYMENT_PIN : TEMPLATE_PAYMENT_BASIC;
+  var props = PropertiesService.getScriptProperties();
+  var templateId = (label === '게시+공지고정')
+    ? props.getProperty('SOLAPI_TPL_PIN')
+    : props.getProperty('SOLAPI_TPL_BASIC');
+  if (!templateId) {
+    Logger.log('알림톡 템플릿 미설정 (SOLAPI_TPL_BASIC/PIN) — 발송 보류');
+    e.range.setValue('발송대기');
+    return;
+  }
   try {
     sendAlimtalk(phone, templateId, { '#{신청자}': company });
     sheet.getRange(row, 11).setValue(Utilities.formatDate(new Date(), 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss'));
