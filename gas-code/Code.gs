@@ -59,10 +59,10 @@ function flagAdText_(text) {
 
 /* ───────────────────────────────────────────
    신청 폼 저장
-   신청 내역(13열):
+   신청 내역(12열):
      A=신청일시, B=결제완료일, C=상호, D=연락처, E=상품선택,
-     F=광고문구, G=이미지URL, H=게시희망일, I=사업자정보,
-     J=검수메모, K=결제링크발송(발송대기/발송하기/발송완료), L=발송시간, M=게시완료
+     F=광고문구, G=이미지URL, H=게시희망일,
+     I=검수메모, J=결제링크발송(발송대기/발송하기/발송완료), K=발송시간, L=게시완료
 ─────────────────────────────────────────── */
 function submitForm(formData) {
   var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
@@ -76,11 +76,11 @@ function submitForm(formData) {
   sheet.appendRow([
     now, '', formData.company || '', formData.phone || '', label,
     formData.adText || '', imageUrl, formData.publishDate || '',
-    '', memo, '발송대기', '', '대기'
+    memo, '발송대기', '', '대기'
   ]);
   var r = sheet.getLastRow();
-  sheet.getRange(r, 11).setValue('발송대기');
-  sheet.getRange(r, 13).setValue('대기');
+  sheet.getRange(r, 10).setValue('발송대기');
+  sheet.getRange(r, 12).setValue('대기');
 
   try {
     var to = getSettings().notifyEmails || 'archoit94@neoflat.net';
@@ -155,21 +155,21 @@ function onEdit(e) {
   if (sheet.getName() !== '신청 내역') return;
   var row = e.range.getRow(), col = e.range.getColumn();
   if (row < 2) return;
-  if (col === 11) handlePaymentSend(e, sheet, row);
+  if (col === 10) handlePaymentSend(e, sheet, row);
 }
 
 function handlePaymentSend(e, sheet, row) {
   if (String(e.range.getValue()).trim() !== '발송하기') return;
-  if (sheet.getRange(row, 12).getValue()) { e.range.setValue('발송완료'); return; } // L 발송시간 가드
-  var rowData = sheet.getRange(row, 1, 1, 13).getValues()[0];
+  if (sheet.getRange(row, 11).getValue()) { e.range.setValue('발송완료'); return; } // K 발송시간 가드
+  var rowData = sheet.getRange(row, 1, 1, 12).getValues()[0];
   var company = String(rowData[2] || '').trim();          // C 상호
   var phone   = String(rowData[3]).replace(/[^0-9]/g, ''); // D 연락처
   var label   = String(rowData[4] || '').trim();           // E 상품선택
   var templateId = label === '게시+공지고정' ? TEMPLATE_PAYMENT_PIN : TEMPLATE_PAYMENT_BASIC;
   try {
     sendAlimtalk(phone, templateId, { '#{신청자}': company });
-    sheet.getRange(row, 12).setValue(Utilities.formatDate(new Date(), 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss'));
-    sheet.getRange(row, 11).setValue('발송완료');
+    sheet.getRange(row, 11).setValue(Utilities.formatDate(new Date(), 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss'));
+    sheet.getRange(row, 10).setValue('발송완료');
   } catch (err) {
     Logger.log('결제링크 알림톡 실패: ' + err);
     e.range.setValue('발송대기');
@@ -205,9 +205,9 @@ function setupSheets() {
   var apply = ss.getSheetByName('신청 내역');
   if (apply.getLastRow() === 0) {
     apply.appendRow(['신청일시', '결제완료일', '상호', '연락처', '상품선택',
-      '광고문구', '이미지URL', '게시희망일', '사업자정보',
+      '광고문구', '이미지URL', '게시희망일',
       '검수메모', '결제링크 발송', '발송시간', '게시완료']);
-    apply.getRange(1, 1, 1, 13).setFontWeight('bold').setBackground('#f0f0f0');
+    apply.getRange(1, 1, 1, 12).setFontWeight('bold').setBackground('#f0f0f0');
   }
   setupDropdowns();
   Logger.log('시트 초기화 완료');
@@ -216,12 +216,12 @@ function setupSheets() {
 function setupDropdowns() {
   var apply = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('신청 내역');
   if (!apply) return;
-  var range = apply.getRange(2, 11, 1000, 1); // K열 결제링크 발송
+  var range = apply.getRange(2, 10, 1000, 1); // J열 결제링크 발송
   range.clearDataValidations();
   range.setDataValidation(SpreadsheetApp.newDataValidation()
     .requireValueInList(['발송대기', '발송하기'], false).build());
   var keep = apply.getConditionalFormatRules().filter(function(r){
-    return r.getRanges().every(function(rng){ return rng.getColumn() !== 11; }); });
+    return r.getRanges().every(function(rng){ return rng.getColumn() !== 10; }); });
   apply.setConditionalFormatRules(keep.concat([
     SpreadsheetApp.newConditionalFormatRule().whenTextEqualTo('발송대기')
       .setBackground('#F5F5F5').setFontColor('#9E9E9E').setRanges([range]).build(),
@@ -230,7 +230,7 @@ function setupDropdowns() {
     SpreadsheetApp.newConditionalFormatRule().whenTextEqualTo('발송완료')
       .setBackground('#E8F5E9').setFontColor('#388E3C').setRanges([range]).build()
   ]));
-  var pub = apply.getRange(2, 13, 1000, 1); // M열 게시완료
+  var pub = apply.getRange(2, 12, 1000, 1); // L열 게시완료
   pub.clearDataValidations();
   pub.setDataValidation(SpreadsheetApp.newDataValidation()
     .requireValueInList(['대기', '완료'], false).build());
@@ -246,6 +246,20 @@ function setupTrigger() {
 /* ───────────────────────────────────────────
    GAS 웹앱 엔드포인트
 ─────────────────────────────────────────── */
+/* 컬럼 구조 변경 후 — 신청 내역 시트 초기화 + 새 헤더로 재생성 (수동 1회 실행)
+   ⚠️ '신청 내역'의 모든 행·서식을 지웁니다(설정 시트는 보존). 실데이터 없을 때만 사용. */
+function resetDataSheets() {
+  var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  var sh = ss.getSheetByName('신청 내역');
+  if (sh) {
+    sh.clear();
+    sh.clearConditionalFormatRules();
+    sh.getRange(1, 1, sh.getMaxRows(), sh.getMaxColumns()).clearDataValidations();
+  }
+  setupSheets();
+  Logger.log('신청 내역 초기화 + 재생성 완료(12열)');
+}
+
 function doGet(e) {
   return ContentService.createTextOutput(JSON.stringify({ status: 'ok' }))
     .setMimeType(ContentService.MimeType.JSON);
