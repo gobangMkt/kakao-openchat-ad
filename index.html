@@ -135,6 +135,36 @@
   .btn:hover{background:var(--blue-press)}
   .btn:active{transform:translateY(1px)}
   .btn:disabled{opacity:.55;box-shadow:none;cursor:default}
+  .cta-in .btn{flex:1}
+
+  /* ── 확인 모달 ── */
+  .ovl{position:fixed;inset:0;z-index:50;background:rgba(14,21,37,.5);display:none;align-items:flex-end;justify-content:center}
+  .ovl.show{display:flex}
+  .sheet{width:100%;max-width:560px;background:#fff;border-radius:24px 24px 0 0;
+    padding:24px 20px calc(22px + env(safe-area-inset-bottom));max-height:90vh;overflow:auto;animation:slideup .25s ease}
+  @keyframes slideup{from{transform:translateY(100%)}to{transform:none}}
+  .sheet h3{margin:0 0 6px;font-size:20px;font-weight:900;letter-spacing:-.6px}
+  .sheet .msub{font-size:13.5px;color:var(--ink-2);margin:0 0 18px;line-height:1.65}
+  .sumbox{background:var(--bg);border-radius:14px;padding:8px 16px;margin-bottom:16px}
+  .sumrow{display:flex;justify-content:space-between;gap:14px;font-size:14px;padding:7px 0;border-bottom:1px solid var(--border)}
+  .sumrow:last-child{border-bottom:none}
+  .sumrow .k{color:var(--muted);flex:none}
+  .sumrow .v{font-weight:600;text-align:right;word-break:break-all}
+  .pv{border:1px solid var(--border);border-radius:14px;margin-bottom:16px;overflow:hidden}
+  .pvh{display:flex;justify-content:space-between;align-items:center;padding:13px 15px;cursor:pointer;background:#FAFBFF}
+  .pvh .t{font-size:13.5px;font-weight:700} .pvh .t .req{color:var(--danger);margin-left:3px}
+  .pvh .ar{font-size:12px;color:var(--muted)}
+  .pvd{display:none;padding:13px 15px;font-size:12.5px;color:var(--ink-2);line-height:1.8;border-top:1px solid var(--border)}
+  .pvd.show{display:block}
+  .pvchk{display:flex;gap:11px;align-items:center;padding:13px 15px;border-top:1px solid var(--border);cursor:pointer;font-size:13.5px;color:var(--ink-2)}
+  .pvchk input{position:absolute;opacity:0;width:0;height:0}
+  .pvchk .box{flex:none;width:22px;height:22px;border-radius:7px;border:2px solid var(--border-strong);display:grid;place-items:center}
+  .pvchk input:checked + .box{background:var(--blue);border-color:var(--blue)}
+  .pvchk .box svg{opacity:0}.pvchk input:checked + .box svg{opacity:1}
+  .mbtns{display:flex;gap:10px}
+  .mbtns .ok{flex:1;border:none;background:var(--blue);color:#fff;font-family:inherit;font-size:15.5px;font-weight:800;padding:15px;border-radius:13px;cursor:pointer;box-shadow:var(--sh-blue)}
+  .mbtns .ok:disabled{opacity:.45;box-shadow:none;cursor:default}
+  .mbtns .no{flex:none;border:1.5px solid var(--border-strong);background:#fff;color:var(--ink-2);font-family:inherit;font-size:15px;font-weight:700;padding:15px 20px;border-radius:13px;cursor:pointer}
 
   /* ── SUCCESS ── */
   .done{display:none;padding:70px 28px;text-align:center}
@@ -248,11 +278,6 @@
           <li>사기·도박·대출 등 <b>리스크·불법 소지</b> 콘텐츠는 검수에서 제한될 수 있어요. (외부 링크 자체는 가능)</li>
         </ul>
       </div>
-      <label class="agree">
-        <input type="checkbox" id="agree" required>
-        <span class="box"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-        <span>위 게시 규칙을 확인했으며, 검수 후 게시되는 것에 동의합니다.</span>
-      </label>
     </section>
   </form>
 </div>
@@ -260,8 +285,34 @@
 <!-- STICKY CTA -->
 <div class="cta" id="cta">
   <div class="cta-in">
-    <div class="sum"><div class="sl">광고 금액</div><div class="sp"><span id="sumPrice">100,000원</span><small>VAT 별도</small></div></div>
     <button class="btn" id="submit" form="form" type="submit">검수 신청하기</button>
+  </div>
+</div>
+
+<!-- 확인·동의 모달 -->
+<div class="ovl" id="ovl">
+  <div class="sheet">
+    <h3>신청 내용 확인</h3>
+    <p class="msub">지금은 <b>결제 단계가 아니에요.</b> 아래 내용으로 검수를 신청하고, 통과되면 입력하신 연락처로 결제링크를 보내드립니다.</p>
+    <div class="sumbox" id="sumbox"></div>
+    <div class="pv">
+      <div class="pvh" id="pvh"><span class="t">개인정보 수집·이용 동의<span class="req">*필수</span></span><span class="ar" id="pvar">▶ 내용 보기</span></div>
+      <div class="pvd" id="pvd">
+        <b>수집 항목</b> 상호/광고주명, 연락처, 광고 문구·이미지<br>
+        <b>수집 목적</b> 광고 게시 신청 접수·검수·결제 안내<br>
+        <b>보유 기간</b> 게시 종료 후 즉시 파기<br>
+        <span style="color:var(--muted)">동의를 거부할 수 있으나, 거부 시 신청이 제한됩니다.</span>
+      </div>
+      <label class="pvchk">
+        <input type="checkbox" id="agree2">
+        <span class="box"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span>위 내용을 확인했으며, 개인정보 수집·이용 및 게시 규칙에 동의합니다.</span>
+      </label>
+    </div>
+    <div class="mbtns">
+      <button class="no" id="mcancel" type="button">돌아가기</button>
+      <button class="ok" id="mok" type="button" disabled>동의하고 검수 신청</button>
+    </div>
   </div>
 </div>
 
@@ -286,7 +337,6 @@ let product = 'B';
 document.querySelectorAll('.plan').forEach(p => p.addEventListener('click', () => {
   document.querySelectorAll('.plan').forEach(x => x.classList.remove('sel'));
   p.classList.add('sel'); product = p.dataset.code;
-  $('#sumPrice').textContent = p.dataset.price + '원';
 }));
 
 /* 연락처 자동 하이픈 */
@@ -332,12 +382,38 @@ $('#pvRm').addEventListener('click', () => {
   $('#preview').classList.remove('show'); $('#drop').style.display='flex';
 });
 
-/* 제출 */
-$('#form').addEventListener('submit', async e => {
-  e.preventDefault();
-  const btn = $('#submit');
-  if (!$('#agree').checked){ alert('게시 규칙 동의가 필요합니다.'); return; }
-  btn.disabled = true; const orig = btn.textContent; btn.textContent = '제출 중...';
+/* 제출 — 1) 폼 검증 통과 시 확인·동의 모달 오픈 */
+const PLABEL = { A:'게시 1회', B:'게시 1회 + 공지 고정 24h' };
+const PPRICE = { A:'50,000원 (VAT 별도)', B:'100,000원 (VAT 별도)' };
+const esc = s => String(s||'-').replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+
+$('#form').addEventListener('submit', e => {
+  e.preventDefault();  // required 필드는 브라우저 기본 검증 통과 후 진입
+  $('#sumbox').innerHTML = [
+    ['상품', PLABEL[product]],
+    ['금액', PPRICE[product]],
+    ['상호/광고주명', $('#company').value.trim()],
+    ['연락처', $('#phone').value.trim()],
+    ['게시 희망일', $('#publishDate').value],
+    ['광고 이미지', imageName || '미첨부']
+  ].map(r => `<div class="sumrow"><span class="k">${r[0]}</span><span class="v">${esc(r[1])}</span></div>`).join('');
+  $('#agree2').checked = false; $('#mok').disabled = true;
+  $('#pvd').classList.remove('show'); $('#pvar').textContent = '▶ 내용 보기';
+  $('#ovl').classList.add('show');
+});
+
+/* 개인정보 접기/펼치기 + 동의 체크 + 취소 */
+$('#pvh').addEventListener('click', () => {
+  const d = $('#pvd'); d.classList.toggle('show');
+  $('#pvar').textContent = d.classList.contains('show') ? '▼ 접기' : '▶ 내용 보기';
+});
+$('#agree2').addEventListener('change', e => { $('#mok').disabled = !e.target.checked; });
+$('#mcancel').addEventListener('click', () => $('#ovl').classList.remove('show'));
+$('#ovl').addEventListener('click', e => { if (e.target === $('#ovl')) $('#ovl').classList.remove('show'); });
+
+/* 2) 동의 후 실제 제출 */
+$('#mok').addEventListener('click', async () => {
+  const ok = $('#mok'); ok.disabled = true; const orig = ok.textContent; ok.textContent = '제출 중...';
   try {
     const body = {
       action:'submitForm', product,
@@ -348,10 +424,11 @@ $('#form').addEventListener('submit', async e => {
     const r = await fetch(GAS_URL, { method:'POST', body: JSON.stringify(body) });
     const j = await r.json();
     if (j.success){
+      $('#ovl').classList.remove('show');
       $('#form').style.display='none'; $('#cta').style.display='none';
       document.querySelector('.hero').style.display='none';
       $('#done').classList.add('show'); window.scrollTo(0,0);
-    } else { alert('제출 실패: ' + (j.error || j.reason || '다시 시도해주세요')); btn.disabled=false; btn.textContent=orig; }
-  } catch(err){ alert('네트워크 오류. 다시 시도해주세요.'); btn.disabled=false; btn.textContent=orig; }
+    } else { alert('제출 실패: ' + (j.error || j.reason || '다시 시도해주세요')); ok.disabled=false; ok.textContent=orig; }
+  } catch(err){ alert('네트워크 오류. 다시 시도해주세요.'); ok.disabled=false; ok.textContent=orig; }
 });
 </script></body></html>
