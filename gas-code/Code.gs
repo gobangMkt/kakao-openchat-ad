@@ -170,9 +170,11 @@ function testAlimtalk() {
 }
 
 /* ───────────────────────────────────────────
-   onEdit — 신청 내역 K열(11) '발송하기' → 결제링크 알림톡
+   설치형 onEdit 핸들러 — 이름을 onEdit이 아닌 onSheetEdit로 둬서
+   '단순 트리거' 자동 중복 실행을 막는다(단순 트리거는 권한 없어 UrlFetch 불가).
+   설치형 트리거는 setupTrigger()로 등록.
 ─────────────────────────────────────────── */
-function onEdit(e) {
+function onSheetEdit(e) {
   var sheet = e.range.getSheet();
   if (sheet.getName() !== '신청 내역') return;
   var row = e.range.getRow(), col = e.range.getColumn();
@@ -296,8 +298,10 @@ function setupDropdowns() {
 
 function setupTrigger() {
   ScriptApp.getProjectTriggers().forEach(function(t){
-    if (t.getHandlerFunction() === 'onEdit') ScriptApp.deleteTrigger(t); });
-  ScriptApp.newTrigger('onEdit')
+    var h = t.getHandlerFunction();
+    if (h === 'onEdit' || h === 'onSheetEdit') ScriptApp.deleteTrigger(t);
+  });
+  ScriptApp.newTrigger('onSheetEdit')
     .forSpreadsheet(SpreadsheetApp.openById(SPREADSHEET_ID)).onEdit().create();
 }
 
