@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none" role="img" aria-label="청년정보 오픈채팅방 광고">
+  <!-- Major: 브랜드 블루 컨테이너 -->
+  <rect x="0" y="0" width="20" height="20" rx="4.5" fill="#1B4DFF"/>
+  <!-- Sub: 메가폰 혼 (흰색) -->
+  <path d="M5 8.2 L5 11.8 L12.6 15.6 L12.6 4.4 Z" fill="#FFFFFF"/>
+  <!-- Sub: 손잡이 -->
+  <rect x="5.5" y="11.4" width="2.3" height="3.4" rx="1.1" fill="#FFFFFF"/>
+  <!-- Micro: 음파 (옐로 악센트) -->
+  <circle cx="14.9" cy="6.6" r="1.05" fill="#FFC84D"/>
+  <circle cx="14.9" cy="13.4" r="1.05" fill="#FFC84D"/>
+  <circle cx="16.7" cy="10" r="1.2" fill="#FFC84D"/>
+</svg>
