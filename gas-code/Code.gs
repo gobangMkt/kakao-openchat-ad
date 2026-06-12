@@ -7,7 +7,7 @@ var TEMPLATE_PAYMENT_PIN   = '';  // 게시+공지고정 결제요청
 
 // 토스 결제링크 (생성 후 채움) — 참고용
 var PAY_LINK_BASIC = '';  // 게시1회 55,000
-var PAY_LINK_PIN   = '';  // 게시+공지고정 110,000
+var PAY_LINK_PIN   = 'https://s.tosspayments.com/BnrvjvvM6g1';  // 게시+공지고정 110,000
 
 /* ───────────────────────────────────────────
    설정 시트 (A=라벨, B=값)
