@@ -11,18 +11,20 @@ var PAY_LINK_PIN   = 'https://s.tosspayments.com/BnrvjvvM6g1';  // 게시+공지
 
 /* ───────────────────────────────────────────
    설정 시트 (A=라벨, B=값)
-   1행 활성화 / 2행 시작일 / 3행 종료일 / 4행 알림이메일
+   1행 활성화 / 2행 시작일 / 3행 종료일
+   4행 신청접수 알림 이메일 / 5행 결제완료 알림 이메일
    6행~ 상품 카탈로그(미래 어드민이 읽는 데이터)
 ─────────────────────────────────────────── */
 function getSettings() {
   var s = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('설정');
-  var data = s.getRange(1, 1, 4, 2).getValues();
+  var data = s.getRange(1, 1, 5, 2).getValues();
+  function emails(v) { return String(v || '').split(/[,\s]+/).filter(function(x){ return x; }).join(','); }
   return {
     active:    String(data[0][1]).trim(),
     startDate: data[1][1] ? new Date(data[1][1]) : null,
     endDate:   data[2][1] ? new Date(data[2][1]) : null,
-    notifyEmails: String(data[3][1] || '')
-      .split(/[,\s]+/).filter(function(x){ return x; }).join(',')
+    notifyEmails: emails(data[3][1]),  // 4행: 신청접수 알림 수신자
+    paidEmails:   emails(data[4][1])   // 5행: 결제완료 알림 수신자
   };
 }
 
@@ -84,7 +86,7 @@ function submitForm(formData) {
 
   try {
     var to = getSettings().notifyEmails || 'archoit94@neoflat.net';
-    MailApp.sendEmail(to, '[고방광고] 새 신청 — ' + (formData.company || '') + ' / ' + label, [
+    MailApp.sendEmail(to, '[고방광고] 새 신청 접수 — ' + (formData.company || '') + ' / ' + label, [
       '신청일시: ' + Utilities.formatDate(now, 'Asia/Seoul', 'yyyy-MM-dd HH:mm'),
       '상호: ' + (formData.company || ''),
       '연락처: ' + (formData.phone || ''),
@@ -155,7 +157,32 @@ function onEdit(e) {
   if (sheet.getName() !== '신청 내역') return;
   var row = e.range.getRow(), col = e.range.getColumn();
   if (row < 2) return;
-  if (col === 10) handlePaymentSend(e, sheet, row);
+  if (col === 10) handlePaymentSend(e, sheet, row);          // J 결제링크 발송
+  else if (col === 2) handlePaymentComplete(e, sheet, row);  // B 결제완료일 입력 → 결제완료 알림
+}
+
+/* B열(2) 결제완료일 입력 시 → 결제완료 알림 메일 (결제완료 수신자에게) */
+function handlePaymentComplete(e, sheet, row) {
+  if (!e.range.getValue()) return;  // 비우면(취소) 무시
+  var rowData = sheet.getRange(row, 1, 1, 12).getValues()[0];
+  var company  = String(rowData[2] || '');  // C 상호
+  var phone    = String(rowData[3] || '');  // D 연락처
+  var label    = String(rowData[4] || '');  // E 상품선택
+  var paidDate = e.range.getDisplayValue();
+  try {
+    var to = getSettings().paidEmails || 'lneleovvnae@neoflat.net';
+    MailApp.sendEmail(to, '[고방광고] 결제 완료 — ' + company + ' / ' + label, [
+      '결제가 완료 처리됐어요.',
+      '',
+      '결제완료일: ' + paidDate,
+      '상호: ' + company,
+      '연락처: ' + phone,
+      '상품: ' + label,
+      '▶ 시트: https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID
+    ].join('\n'));
+  } catch (err) {
+    Logger.log('결제완료 알림 실패: ' + err);
+  }
 }
 
 function handlePaymentSend(e, sheet, row) {
@@ -188,11 +215,12 @@ function setupSheets() {
 
   var s = ss.getSheetByName('설정');
   if (String(s.getRange(1, 1).getValue()).trim() === '') {
-    s.getRange(1, 1, 4, 2).setValues([
+    s.getRange(1, 1, 5, 2).setValues([
       ['활성화(ON/OFF)', 'ON'],
       ['시작일', ''],
       ['종료일', ''],
-      ['알림 이메일', 'archoit94@neoflat.net']
+      ['신청접수 알림 이메일', 'archoit94@neoflat.net'],
+      ['결제완료 알림 이메일', 'lneleovvnae@neoflat.net']
     ]);
     // 상품 카탈로그(미래 어드민이 읽는 데이터) — 6행~
     s.getRange(6, 1, 3, 4).setValues([
@@ -211,6 +239,16 @@ function setupSheets() {
   }
   setupDropdowns();
   Logger.log('시트 초기화 완료');
+}
+
+/* 기존 설정 시트에 알림 이메일 2행(4·5) 라벨+기본값 보정 — 1회 실행 */
+function setupEmails() {
+  var s = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('설정');
+  s.getRange(4, 1).setValue('신청접수 알림 이메일');
+  if (!String(s.getRange(4, 2).getValue()).trim()) s.getRange(4, 2).setValue('archoit94@neoflat.net');
+  s.getRange(5, 1).setValue('결제완료 알림 이메일');
+  if (!String(s.getRange(5, 2).getValue()).trim()) s.getRange(5, 2).setValue('lneleovvnae@neoflat.net');
+  Logger.log('알림 이메일 설정 갱신 완료 (신청접수=B4, 결제완료=B5)');
 }
 
 function setupDropdowns() {
